@@ -1,10 +1,27 @@
-﻿namespace Graph_database
+using System;
+
+class Node<T>
 {
-    internal class Program
+    public T Value { get; set; }
+    public Node(T value)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
+        Value = value;
+    }
+}
+class Edge<T>
+{
+    public Node<T> From { get; set; }
+    public Node<T> To { get; set; }
+    public Edge(Node<T> from, Node<T> to)
+    {
+        From = from;
+        To = to;
+    }
+}
+class Graph<T>
+{
+    public void AddNode(Node<T> node) 
+    {
+        // Implementation here
     }
 }
