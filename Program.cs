@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using static Edge_Data;
 
 public abstract class Graph_Data
 {
@@ -13,14 +15,13 @@ public abstract class Graph_Data
     {
         public string Name { get; set; }
         public int Age { get; set; }
-        public string PositionInCompany { get; set; }
         override public string GetDisplayName()
         {
             return Name;
         }
         override public string GetDetails()
         {
-            return $"Name: {Name}, Age: {Age}, Position in company: {PositionInCompany}";
+            return $"Name: {Name}, Age: {Age}";
         }
     }
     public class CityData : Graph_Data
@@ -51,34 +52,62 @@ public abstract class Graph_Data
     }
 
 }
-public class Node<Tkey, Tdata> where Tdata : Graph_Data
+public class Node<Tkey, Tdata ,TEdge_data> 
+    where Tdata : Graph_Data 
+    where TEdge_data : Edge_Data
 {
     public Tkey ID { get; set; }
     public Tdata Data { get; set; }
-    public List<Edge<Tkey, Tdata>> Edges { get; set; } = new List<Edge<Tkey, Tdata>>();    
+    public List<Edge<Tkey, Tdata, TEdge_data>> Edges { get; set; } = new List<Edge<Tkey, Tdata, TEdge_data>>();    
     public Node(Tkey id , Tdata data)
     {
         ID = id;
         Data = data;
     }
 }
-
-public class Edge<Tkey, Tdata> where Tdata : Graph_Data
+public abstract class Edge_Data
 {
-    public Node<Tkey,Tdata>  From { get; set; }
-    public Node<Tkey, Tdata> To { get; set; }
-    public Edge(Node<Tkey, Tdata> from, Node<Tkey,Tdata> to)
+    public double Weight { get; set; } = 1.0;
+    public abstract string GetDecscription();
+    public class Edge_Friends : Edge_Data
+    {
+        public DateTime FriendsSince { get; set; }
+        public override string GetDecscription() 
+        { 
+            return $"Friends since {FriendsSince.Year}"; 
+        }
+    }
+    public class WorksAtEdge : Edge_Data
+    {
+        public string Role { get; set; }
+        public override string GetDecscription()
+        {
+            return $"Works since {Role}";
+        }
+    } 
+}
+public class Edge<Tkey, Tdata ,TEdge_data> 
+    where Tdata : Graph_Data 
+    where TEdge_data : Edge_Data
+{
+    public Node<Tkey,Tdata, TEdge_data>  From { get; set; }
+    public Node<Tkey, Tdata, TEdge_data> To { get; set; }
+    public TEdge_data Data { get; set; }
+    public Edge(Node<Tkey, Tdata, TEdge_data> from, Node<Tkey,Tdata, TEdge_data> to, TEdge_data data)
     {
         From = from;
         To = to;
+        Data = data;
     }
 }
 
-public class Graph<TKey, TData> where TData : Graph_Data
+public class Graph<TKey, TData, TEdge_data> 
+    where TData : Graph_Data 
+    where TEdge_data : Edge_Data
 {
-    private Dictionary<TKey, Node<TKey, TData>> nodes = new Dictionary<TKey, Node<TKey, TData>>();
+    private Dictionary<TKey, Node<TKey, TData, TEdge_data>> nodes = new Dictionary<TKey, Node<TKey, TData, TEdge_data>>();
 
-    private List<Edge<TKey, TData>> edges = new List<Edge<TKey, TData>>();
+    private List<Edge<TKey, TData, TEdge_data>> edges = new List<Edge<TKey, TData, TEdge_data>>();
 
     public void AddNode(TKey id, TData data)
     {
@@ -88,19 +117,18 @@ public class Graph<TKey, TData> where TData : Graph_Data
             return;
         }
 
-        var newNode = new Node<TKey, TData>(id, data);
+        var newNode = new Node<TKey, TData, TEdge_data>(id, data);
         nodes.Add(id, newNode);
 
         Console.WriteLine($"Node '{newNode.Data.GetDisplayName()}' added with ID {id}.");
     }
 
-    public void AddEdge(TKey fromId, TKey toId)
+    public void AddEdge(TKey fromId, TKey toId , TEdge_data edge_data)
     {
-        // Шукаємо вузли за їхніми КЛЮЧАМИ (ID)
         if (nodes.TryGetValue(fromId, out var fromNode) &&
             nodes.TryGetValue(toId, out var toNode))
         {
-            var edge = new Edge<TKey, TData>(fromNode, toNode);
+            var edge = new Edge<TKey, TData, TEdge_data>(fromNode, toNode, edge_data);
             edges.Add(edge);
             fromNode.Edges.Add(edge);
 
@@ -112,7 +140,7 @@ public class Graph<TKey, TData> where TData : Graph_Data
         }
     }
 
-    public Node<TKey, TData> GetNode(TKey id)
+    public Node<TKey, TData, TEdge_data> GetNode(TKey id)
     {
         nodes.TryGetValue(id, out var node);
         return node;
@@ -123,18 +151,19 @@ class Program
 {
     static void Main(string[] args)
     {
-        var graph = new Graph<string, Graph_Data>();
+        var graph = new Graph<string, Graph_Data,Edge_Data>();
 
         var person1 = new Graph_Data.PersonData { Name = "Іван", Age = 30 };
         var person2 = new Graph_Data.PersonData { Name = "Марія", Age = 25 };
         var city1 = new Graph_Data.CityData { CityName = "Київ", Population = 2_800_000 };
-
+        var friendship = new Edge_Friends { FriendsSince = new DateTime(2020, 1, 1) };
+        var job = new WorksAtEdge { Role = "Developer" };
         graph.AddNode("p1", person1); 
         graph.AddNode("p2", person2);
         graph.AddNode("c1", city1);
 
-        graph.AddEdge("p1", "p2");
-        graph.AddEdge("p1", "c1");
+        graph.AddEdge("p1", "p2",friendship);
+        graph.AddEdge("p1", "c1",job);
 
         Console.WriteLine("\n--- Details of node 'p1' ---");
         var node1 = graph.GetNode("p1");
