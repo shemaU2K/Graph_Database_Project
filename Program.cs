@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using static Edge_Data;
@@ -100,7 +101,6 @@ public class Edge<Tkey, Tdata ,TEdge_data>
         Data = data;
     }
 }
-
 public class Graph<TKey, TData, TEdge_data> 
     where TData : Graph_Data 
     where TEdge_data : Edge_Data
@@ -139,13 +139,46 @@ public class Graph<TKey, TData, TEdge_data>
             Console.WriteLine("Error: One or both nodes not found by ID.");
         }
     }
+    public void AddEdge(Node<TKey, TData, TEdge_data>fromNode , Node<TKey,TData, TEdge_data> toNode , TEdge_data edge_data)
+    {   if(fromNode == null || toNode == null)
+        {
+            Console.WriteLine("Error: One or both nodes are null.");
+            return;
+        }
+        else {
+            var edge = new Edge<TKey, TData, TEdge_data>(fromNode, toNode, edge_data);
+        edges.Add(edge);
+        fromNode.Edges.Add(edge);
+        Console.WriteLine($"Edge from '{fromNode.Data.GetDisplayName()}' to '{toNode.Data.GetDisplayName()}' added."); 
+        }
+    }
 
+    public void RemoveNode(TKey id) {
+        if(nodes.Remove(id, out var node))
+        {
+            edges.RemoveAll(e => e.From == node || e.To == node);
+            Console.WriteLine($"Node with ID {id} removed.");
+        }
+        else
+        {
+            Console.WriteLine($"Error: Node with ID {id} not found.");
+        }
+    }
     public Node<TKey, TData, TEdge_data> GetNode(TKey id)
     {
         nodes.TryGetValue(id, out var node);
         return node;
     }
+    public Node<TKey, TData, TEdge_data> GetNode(TData data)
+    {
+        return nodes.Values.FirstOrDefault(n => n.Data.Equals(data));
+    }
+    public IEnumerable<Node<TKey, TData, TEdge_data>> GetAllNodes()
+    {
+        return nodes.Values;
+    }
 }
+
 
 class Program
 {
@@ -164,9 +197,11 @@ class Program
 
         graph.AddEdge("p1", "p2",friendship);
         graph.AddEdge("p1", "c1",job);
-
+        graph.GetAllNodes();
         Console.WriteLine("\n--- Details of node 'p1' ---");
         var node1 = graph.GetNode("p1");
+        graph.RemoveNode("p1");
+        Console.WriteLine($"Node {person1} has been removed");
         if (node1 != null)
         {
             Console.WriteLine(node1.Data.GetDetails());
