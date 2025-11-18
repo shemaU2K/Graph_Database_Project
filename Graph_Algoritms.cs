@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 public static class GraphAlgorithms
 {
@@ -129,6 +131,57 @@ public static class GraphAlgorithms
         {
             resultPath.Add(current);
             current = cameFrom[current];
+        }
+        resultPath.Add(startNode);
+        resultPath.Reverse();
+        return resultPath;
+    }
+    public static List<Node<Tkey, Tdata, TEdge_data>> Dijkstra_Search<Tkey, Tdata, TEdge_data>(
+        Graph<Tkey, Tdata, TEdge_data> graph,
+        Node<Tkey, Tdata, TEdge_data> startNode,
+        Node<Tkey, Tdata, TEdge_data> goalNode)
+        where Tdata : Graph_Data
+        where TEdge_data : Edge_Data
+    {
+        var cost = new Dictionary<Node<Tkey, Tdata, TEdge_data>, double>();
+        var priorityQueue = new PriorityQueue<Node<Tkey, Tdata, TEdge_data>, double>();
+        var cameFrom = new Dictionary<Node<Tkey, Tdata, TEdge_data>, Node<Tkey, Tdata, TEdge_data>>();
+        priorityQueue.Enqueue(startNode, 0);
+        cost[startNode] = 0;
+        while (priorityQueue.Count > 0)
+        {
+            if(!priorityQueue.TryDequeue(out var currentNode, out var currentCost))
+            {
+                break;
+            }
+            if(goalNode == currentNode)
+            {
+                break;
+            }
+            foreach(var edge in currentNode.Edges)
+            {
+                var neighbor = edge.To;
+                double newCost = currentCost + edge.Data.Weight;
+                double OldCost = cost.ContainsKey(neighbor) ? cost[neighbor] : double.MaxValue;
+                if (newCost < OldCost)
+                {
+                    cost[neighbor] = newCost;       
+                    cameFrom[neighbor] = currentNode;
+                    priorityQueue.Enqueue(neighbor, newCost);
+                }
+            }
+        }
+        var resultPath = new List<Node<Tkey, Tdata, TEdge_data>>();
+        if (!cameFrom.ContainsKey(goalNode) && startNode != goalNode)
+        {
+            return resultPath;
+        }
+
+        var currentPathNode = goalNode;
+        while (currentPathNode != startNode)
+        {
+            resultPath.Add(currentPathNode);
+            currentPathNode = cameFrom[currentPathNode];
         }
         resultPath.Add(startNode);
         resultPath.Reverse();
