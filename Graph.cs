@@ -77,18 +77,20 @@ public class Graph<TKey, TData, TEdge_data>
     {
         return nodes.Values;
     }
-    public void RemoveEdge(TKey fromId, TKey toId)
+    public bool RemoveEdge(TKey fromID, TKey toID)
     {
-        var edge = edges.FirstOrDefault(e => e.From.ID.Equals(fromId) && e.To.ID.Equals(toId));
+        var edge = edges.FirstOrDefault(e => e.From.ID.Equals(fromID) && e.To.ID.Equals(toID));
         if (edge != null)
         {
             edges.Remove(edge);
             edge.From.Edges.Remove(edge);
             Console.WriteLine($"Edge from '{edge.From.Data.GetDisplayName()}' to '{edge.To.Data.GetDisplayName()}' removed.");
+            return true;
         }
         else
         {
             Console.WriteLine("Error: Edge not found.");
+            return false;
         }
     }
 }
