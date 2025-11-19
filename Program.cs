@@ -1,23 +1,64 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using static Graph_Data;
 using GraphType = Graph<string, Graph_Data, Edge_Data>;
 using NodeType = Node<string, Graph_Data, Edge_Data>;
 
 public class Program
 {
-    private const string FILE_PATH = "graph_data.json";
-    private static GraphType graph = null;
+    private static GraphType graph = new GraphType();
+    private const string FILE_PATH = "graph_database.json";
 
     static void Main(string[] args)
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-       
+        Console.WriteLine("=== Graph Database Project (v1.0) ===");
         RunMenuLoop();
     }
+    private static void RunMenuLoop()
+    {
+        while (true)
+        {
+            Console.WriteLine("\n-------------------------------------------");
+            Console.WriteLine("Main menu:");
+            Console.WriteLine("1. Add Node");
+            Console.WriteLine("2. Add Edge");
+            Console.WriteLine("3. Remove Node");
+            Console.WriteLine("4. Remove Edge");
+            Console.WriteLine("5. BFS / DFS / Dijkstra");
+            Console.WriteLine("6. Has Cycle?");
+            Console.WriteLine("7. Save");
+            Console.WriteLine("8. Load");
+            Console.WriteLine("9. Demo Polymorphism");
+            Console.WriteLine("0. Exit");
 
+            int choice = ReadInt("> Ваш вибір: ");
+
+            switch (choice)
+            {
+                case 1: HandleAddNode(); break;
+                case 2: HandleAddEdge(); break;
+                case 3: HandleRemoveNode(); break;
+                case 4: HandleRemoveEdge(); break;
+                case 5: HandlePathfinding(); break; // <-- Треба дописати цей метод виклику алгоритмів
+                case 6:
+                    bool hasCycle = GraphAlgorithms.HasCycle(graph);
+                    Console.WriteLine(hasCycle ? "[!!!] Graph has cycle!" : "[OK] Cycles not found.");
+                    break;
+                case 7:
+                    Graph_SaverToFile.SaveToFile(graph, FILE_PATH);
+                    break;
+                case 8:
+                    graph = Graph_SaverToFile.LoadFromFile<string, Graph_Data, Edge_Data>(FILE_PATH);
+                    break;
+                case 9:
+                    foreach (var node in graph.GetAllNodes())
+                        Console.WriteLine(node.Data.GetDetails());
+                    break;
+                case 0: return;
+                default: Console.WriteLine("Uknown command."); break;
+            }
+        }
+    }
     private static void ShowPath(List<NodeType> path, string algorithmName)
     {
         Console.WriteLine($"\n--- Результат: {algorithmName} ---");
@@ -29,34 +70,6 @@ public class Program
 
         Console.WriteLine($"Знайдено шлях (довжина: {path.Count - 1}):");
         Console.WriteLine(string.Join(" -> ", path.Select(n => n.Data.GetDisplayName())));
-    }
-
-    private static void RunMenuLoop()
-    {
-        while (true)
-        {
-            Console.WriteLine("\n--------------------------------------------------");
-            Console.WriteLine("Оберіть дію:");
-            Console.WriteLine("1:Add new Node with Nodes data");
-            Console.WriteLine("2: Пошук шляху (BFS, DFS, Дейкстра)");
-            Console.WriteLine("3: Перевірка на цикли (HasCycle)");
-            Console.WriteLine("4: ЗБЕРЕГТИ граф в файл");
-            Console.WriteLine("5: ЗАВАНТАЖИТИ граф з файлу");
-            Console.WriteLine("0: Вихід");
-            Console.Write("Введіть номер: ");
-
-            if (!int.TryParse(Console.ReadLine(), out int choice)) continue;
-            switch (choice)
-            {
-                case 1: HandleAddNode(); break;
-                case 2: RunPathfinding(); break;
-                case 3: RunCycleCheck(); break;
-                case 4: GraphSerializer.SaveToFile(graph, FILE_PATH); break;
-                case 5: graph = GraphSerializer.LoadFromFile(FILE_PATH); break;
-                case 0: return;
-                default: Console.WriteLine("Невідома команда."); break;
-            }
-        }
     }
     private static int ReadInt(string prompt)
     {
@@ -90,18 +103,18 @@ public class Program
             case 1:
                 string name = ReadString("Ім'я: ");
                 int age = ReadInt("Вік: ");
-                nodeData = new PersonData { Name = name, Age = age };
+                nodeData = new Graph_Data.PersonData { Name = name, Age = age };
                 break;
             case 2:
                 string city = ReadString("Назва Міста: ");
                 int population = ReadInt("Населення: ");
-                nodeData = new CityData { CityName = city, Population = population };
+                nodeData = new Graph_Data.CityData { CityName = city, Population = population };
                 break;
 
             case 3:
                 string company = ReadString("Назва Компанії: ");
                 string industry = ReadString("Галузь: ");
-                nodeData = new CompanyData { CompanyName = company, Industry = industry };
+                nodeData = new Graph_Data.CompanyData { CompanyName = company, Industry = industry };
                 break;
 
             default:
@@ -130,7 +143,7 @@ public class Program
         {
             case 1:
                 int year = ReadInt("Рік початку дружби: ");
-                var since = new DateTime(year, 1, 1); 
+                var since = new DateTime(year, 1, 1);
                 var weigth = ReadInt("Вага ребра (число): ");
                 edgeData = new Edge_Data.Edge_Friends { FriendsSince = since, Weight = weigth };
                 break;
@@ -159,19 +172,25 @@ public class Program
             }
         }
     }
-
-    static void HandleRemoveNode() 
+    static void HandleRemoveNode()
     {
         Console.WriteLine("\n--- ВИДАЛЕННЯ ВУЗЛА ---");
         string nodeID = ReadString("Введіть ID вузла для видалення: ");
         graph.RemoveNode(nodeID);
     }
-    static void HandleRemoveEdge() 
+    static void HandleRemoveEdge()
     {
         Console.WriteLine("\n--- ВИДАЛЕННЯ ЗВ'ЯЗКУ ---");
         string fromID = ReadString("Введіть ID початкового вузла: ");
         string toID = ReadString("Введіть ID кінцевого вузла: ");
-        graph.RemoveEdge(fromID, toID);
+        if (graph.RemoveEdge(fromID, toID))
+        {
+            Console.WriteLine("[УСПІХ]: Зв'язок видалено.");
+        }
+        else
+        {
+            Console.WriteLine("[ПОМИЛКА]: Зв'язок або вузли не знайдено.");
+        }
     }
     private static void DemonstratePolymorphism()
     {
@@ -185,11 +204,9 @@ public class Program
         if (firstEdge != null)
         {
             Console.WriteLine($"\n-> Перше ребро: {firstEdge.From.Data.GetDisplayName()} -> {firstEdge.To.Data.GetDisplayName()}");
-            Console.WriteLine($"   Тип ребра: {firstEdge.Data.GetDescription()}");
+            Console.WriteLine($"   Тип ребра: {firstEdge.Data.GetDecscription()}");
         }
     }
-
-
     private static void RunPathfinding()
     {
         Console.WriteLine("\n--- 2. Пошук Шляху (Start: Іван, End: Київ) ---");
@@ -211,7 +228,32 @@ public class Program
         var pathDijkstra = GraphAlgorithms.Dijkstra_Search(graph, start, end);
         ShowPath(pathDijkstra, "Дейкстра (Найменша вага)");
     }
+    private static void HandlePathfinding()
+    {
+        string startId = ReadString("Start Node ID: ");
+        string endId = ReadString("End Node ID: ");
+        var startNode = graph.GetNode(startId);
+        var endNode = graph.GetNode(endId);
 
+        if (startNode != null && endNode != null)
+        {
+            Console.WriteLine("Оберіть алгоритм: 1-BFS, 2-DFS, 3-Dijkstra");
+            int alg = ReadInt("Вибір: ");
+
+            List<NodeType> path = null;
+
+            if (alg == 1) path = GraphAlgorithms.BFS_Research(graph, startNode, n => n == endNode);
+            else if (alg == 2) path = GraphAlgorithms.DFS_Research(graph, startNode, n => n == endNode);
+            else if (alg == 3) path = GraphAlgorithms.Dijkstra_Search(graph, startNode, endNode);
+
+            if (path != null && path.Count > 0)
+            {
+                Console.WriteLine("Шлях знайдено: " + string.Join(" -> ", path.Select(n => n.ID)));
+            }
+            else Console.WriteLine("Шлях не знайдено.");
+        }
+        else Console.WriteLine("Вузли не знайдено.");
+    }
     private static void RunCycleCheck()
     {
         Console.WriteLine("\n--- 3. Перевірка на Цикли ---");
