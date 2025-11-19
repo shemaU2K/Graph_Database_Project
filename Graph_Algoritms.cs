@@ -43,7 +43,7 @@ public static class GraphAlgorithms
         return filteredNodes;
     }
 
-    public static List<Node<Tkey, Tdata, TEdge_data>> BFS_Reserch<Tkey, Tdata, TEdge_data>(
+    public static List<Node<Tkey, Tdata, TEdge_data>> BFS_Research<Tkey, Tdata, TEdge_data>(
         Graph<Tkey, Tdata, TEdge_data> graph,
         Node<Tkey, Tdata, TEdge_data> startNode,
         Func<Node<Tkey, Tdata, TEdge_data>, bool> goalTest)
@@ -89,7 +89,7 @@ public static class GraphAlgorithms
         resultPath.Reverse();
         return resultPath;
     }
-    static public List<Node<Tkey, Tdata, TEdge_data>> DFS_Reserch<Tkey, Tdata, TEdge_data>(
+    static public List<Node<Tkey, Tdata, TEdge_data>> DFS_Research<Tkey, Tdata, TEdge_data>(
          Graph<Tkey, Tdata, TEdge_data> graph,
          Node<Tkey, Tdata, TEdge_data> startNode,
          Func<Node<Tkey, Tdata, TEdge_data>, bool> goalTest)
@@ -186,5 +186,51 @@ public static class GraphAlgorithms
         resultPath.Add(startNode);
         resultPath.Reverse();
         return resultPath;
+    }
+    public static bool HasCycle<TKey, TData, TEdgeData>(Graph<TKey, TData, TEdgeData> graph)
+        where TData : Graph_Data
+        where TEdgeData : Edge_Data
+    {
+        var visited = new HashSet<Node<TKey, TData, TEdgeData>>();
+        var pathSet = new HashSet<Node<TKey, TData, TEdgeData>>();
+        foreach (var node in graph.GetAllNodes())
+        {
+            if (!visited.Contains(node))
+            {
+                if (HasCycleRecursive(node, visited, pathSet))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private static bool HasCycleRecursive<TKey, TData, TEdgeData>(
+    Node<TKey, TData, TEdgeData> node,
+    HashSet<Node<TKey, TData, TEdgeData>> visited,
+    HashSet<Node<TKey, TData, TEdgeData>> pathSet)
+    where TData : Graph_Data
+    where TEdgeData : Edge_Data
+    {
+        if(pathSet.Contains(node))
+        {
+            return true;
+        }
+        if(visited.Contains(node))
+        {
+            return false;
+        }
+        pathSet.Add(node);
+        visited.Add(node);
+        foreach(var edge in node.Edges)
+        {
+            var neighbor = edge.To;
+            if(HasCycleRecursive(neighbor, visited, pathSet))
+            {
+                return true;
+            }
+        }
+        pathSet.Remove(node);
+        return false;
     }
 }
