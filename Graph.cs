@@ -77,6 +77,10 @@ public class Graph<TKey, TData, TEdge_data>
     {
         return nodes.Values;
     }
+    public IEnumerable<Edge<TKey, TData, TEdge_data>> GetAllEdges()
+    {
+        return edges;
+    }
     public bool RemoveEdge(TKey fromID, TKey toID)
     {
         if (nodes.TryGetValue(fromID, out var fromNode))
