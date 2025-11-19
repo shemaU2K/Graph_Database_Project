@@ -1,10 +1,8 @@
-﻿using System;
-
 public class Graph<TKey, TData, TEdge_data>
     where TData : Graph_Data
     where TEdge_data : Edge_Data
 {
-    private Dictionary<TKey, Node<TKey, TData, TEdge_data>> nodes = new Dictionary<TKey, Node<TKey, TData, TEdge_data>>();
+    private Dictionary<TKey, Node<TKey,TData, TEdge_data>> nodes = new Dictionary<TKey, Node<TKey, TData, TEdge_data>>();
 
     private List<Edge<TKey, TData, TEdge_data>> edges = new List<Edge<TKey, TData, TEdge_data>>();
 
@@ -78,5 +76,19 @@ public class Graph<TKey, TData, TEdge_data>
     public IEnumerable<Node<TKey, TData, TEdge_data>> GetAllNodes()
     {
         return nodes.Values;
+    }
+    public void RemoveEdge(TKey fromId, TKey toId)
+    {
+        var edge = edges.FirstOrDefault(e => e.From.ID.Equals(fromId) && e.To.ID.Equals(toId));
+        if (edge != null)
+        {
+            edges.Remove(edge);
+            edge.From.Edges.Remove(edge);
+            Console.WriteLine($"Edge from '{edge.From.Data.GetDisplayName()}' to '{edge.To.Data.GetDisplayName()}' removed.");
+        }
+        else
+        {
+            Console.WriteLine("Error: Edge not found.");
+        }
     }
 }
