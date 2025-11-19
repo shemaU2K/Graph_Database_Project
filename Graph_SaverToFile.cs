@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -9,14 +9,12 @@ public class NodeDTO<TKey, TData>
     public TKey Id { get; set; }
     public TData Data { get; set; }
 }
-
 public class EdgeDTO<TKey, TEdgeData>
 {
     public TKey FromId { get; set; }
     public TKey ToId { get; set; }
     public TEdgeData Data { get; set; }
 }
-
 public class GraphContainer<TKey, TData, TEdgeData>
     where TData : Graph_Data
     where TEdgeData : Edge_Data
@@ -24,9 +22,7 @@ public class GraphContainer<TKey, TData, TEdgeData>
     public List<NodeDTO<TKey, TData>> Nodes { get; set; } = new();
     public List<EdgeDTO<TKey, TEdgeData>> Edges { get; set; } = new();
 }
-public class Graph_SaverToFile<TKey, TData, TEdge_data>
-    where TData : Graph_Data
-    where TEdge_data : Edge_Data
+public static class Graph_SaverToFile
 {
     public static void SaveToFile<TKey, TData, TEdgeData>(
         Graph<TKey, TData, TEdgeData> graph,
