@@ -1,4 +1,10 @@
-﻿using System;
+using System;
+using System.Text.Json.Serialization;
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
+[JsonDerivedType(typeof(PersonData), typeDiscriminator: "person")] 
+[JsonDerivedType(typeof(CityData), typeDiscriminator: "city")]
+[JsonDerivedType(typeof(CompanyData), typeDiscriminator: "company")]
 
 public abstract class Graph_Data
 {
