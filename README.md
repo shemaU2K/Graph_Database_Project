@@ -1,23 +1,42 @@
-# Custom Graph Database (C#)
+# 🕸️ Custom Graph Database (C#)
 
-A lightweight graph database implemented from scratch in C# without using third-party libraries for data structures. The project demonstrates a deep understanding of algorithms, data structures, and OOP principles.
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![.NET](https://img.shields.io/badge/.NET-8.0-purple) ![License](https://img.shields.io/badge/license-MIT-blue)
 
-## 🚀 Main features
+A powerful, typed graph database developed from scratch in C#. The project implements its own data structures and classic algorithms without using third-party graphics libraries.
 
-* **Generics:** Fully typed structure (Key, Node data, Edge data).
-* **Polymorphism:**
-    * Support for different types of nodes (`Person`, `City`, `Company`).
-    * Different types of edges (`Friendship`, `WorksAt`).
+## 🌟 Особливості
+
+* **Generic Architecture:** Flexible type system `<TKey, TData, TEdgeData>`.
+* **Polymorphism Support:**
+    * Nodes: `PersonData`, `CityData`, `CompanyData`.
+    * Edges: `FriendshipEdge`, `WorksAtEdge`.
 * **Algorithms:**
-    * 🔍 **BFS**.
-    * 🧠 **DFS**.
-    * ⚡ **Dijkstra**.
-    * 🔄 **Cycle Detection**
-* **Persistence:** Saving and loading databases in JSON format.
+    * 🔍 **BFS:**.
+    * 🧠 **DFS:**.
+    * ⚡ **Dijkstra:**.
+    * 🔄 **Cycle Detection:**.
+* **Persistence:** Saving/Loading a database in JSON (System.Text.Json).
+* **Unit Testing:** Coverage with xUnit tests (20+ tests).
 
-## 🛠️ Technologies
+## 🏗️ Class Architecture
 
-* **Language:** C# (.NET 9.0)
-* **Testing:** xUnit
-* **Serialization:** System.Text.Json
-* **Patterns:** MVC (Console UI separate from logic), DTO, Repository (Graph).
+```mermaid
+classDiagram
+    class Graph {
+        +Dictionary Nodes
+        +AddNode()
+        +AddEdge()
+        +RemoveNode()
+    }
+    class Node {
+        +TKey ID
+        +TData Data
+        +List Edges
+    }
+    class Edge {
+        +Node From
+        +Node To
+        +TEdgeData Data
+    }
+    Graph *-- Node
+    Node *-- Edge
