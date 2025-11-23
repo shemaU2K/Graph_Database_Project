@@ -1,3 +1,9 @@
+/// <summary>
+/// Represents a graph data structure implemented through adjacency lists.
+/// </summary>
+/// <typeparam name="TKey">Unique type to inditify Node.</typeparam>
+/// <typeparam name="TData">Data type whats containing Node data (must inherit from Graph_Data).</typeparam>
+/// <typeparam name="TEdgeData">Data type whats containing Edge data (must inherit from Edge_Data).</typeparam>
 public class Graph<TKey, TData, TEdge_data>
     where TData : Graph_Data
     where TEdge_data : Edge_Data
@@ -5,7 +11,6 @@ public class Graph<TKey, TData, TEdge_data>
     private Dictionary<TKey, Node<TKey,TData, TEdge_data>> nodes = new Dictionary<TKey, Node<TKey, TData, TEdge_data>>();
 
     private List<Edge<TKey, TData, TEdge_data>> edges = new List<Edge<TKey, TData, TEdge_data>>();
-
     public void AddNode(TKey id, TData data)
     {
         if (nodes.ContainsKey(id))
@@ -19,7 +24,6 @@ public class Graph<TKey, TData, TEdge_data>
 
         Console.WriteLine($"Node '{newNode.Data.GetDisplayName()}' added with ID {id}.");
     }
-
     public void AddEdge(TKey fromId, TKey toId, TEdge_data edge_data)
     {
         if (nodes.TryGetValue(fromId, out var fromNode) &&
@@ -51,7 +55,6 @@ public class Graph<TKey, TData, TEdge_data>
             Console.WriteLine($"Edge from '{fromNode.Data.GetDisplayName()}' to '{toNode.Data.GetDisplayName()}' added.");
         }
     }
-
     public void RemoveNode(TKey id)
     {
         if (nodes.Remove(id, out var node))
