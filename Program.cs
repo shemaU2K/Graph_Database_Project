@@ -1,34 +1,64 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Graph_Data;
+
+
+// Alias types for convenience and code brevity
 using GraphType = Graph<string, Graph_Data, Edge_Data>;
 using NodeType = Node<string, Graph_Data, Edge_Data>;
 
-public class Program
+/// <summary>
+/// The entry point of the Graph Database Console Application.
+/// Provides a CLI (Command Line Interface) for interacting with the graph: 
+/// creating nodes, connecting them, running algorithms, and saving data.
+/// </summary>
+class Program
 {
+    /// <summary>
+    /// The global graph instance used throughout the application runtime.
+    /// </summary>
     private static GraphType graph = new GraphType();
+
+    /// <summary>
+    /// The default file path for saving/loading the database.
+    /// </summary>
     private const string FILE_PATH = "graph_database.json";
 
+    /// <summary>
+    /// Main entry point. Configures the console and starts the application loop.
+    /// </summary>
+    /// <param name="args">Command line arguments (not used).</param>
     static void Main(string[] args)
     {
-        Console.WriteLine("=== Graph Database Project (v1.01) ===");
+        // Set encoding to support Cyrillic characters if needed
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        Console.WriteLine("=== Graph Database Project (v1.0) ===");
+
+        // Start the interactive menu loop
         RunMenuLoop();
     }
+
+    /// <summary>
+    /// Displays the main menu and handles user selection in an infinite loop.
+    /// Acts as the main controller for the application logic.
+    /// </summary>
     private static void RunMenuLoop()
     {
         while (true)
         {
             Console.WriteLine("\n-------------------------------------------");
-            Console.WriteLine("Main menu:");
+            Console.WriteLine("MAIN MENU:");
             Console.WriteLine("1. Add Node");
             Console.WriteLine("2. Add Edge");
             Console.WriteLine("3. Remove Node");
             Console.WriteLine("4. Remove Edge");
-            Console.WriteLine("5. BFS / DFS / Dijkstra");
-            Console.WriteLine("6. Has Cycle?");
-            Console.WriteLine("7. Save");
-            Console.WriteLine("8. Load");
-            Console.WriteLine("9. Demo Polymorphism");
+            Console.WriteLine("5. Find Path (BFS / DFS / Dijkstra)");
+            Console.WriteLine("6. Check for Cycles");
+            Console.WriteLine("7. Save to File");
+            Console.WriteLine("8. Load from File");
+            Console.WriteLine("9. Show All Nodes (Polymorphism Demo)");
             Console.WriteLine("0. Exit");
 
             int choice = ReadInt("> Your choice: ");
@@ -42,17 +72,28 @@ public class Program
                 case 5: HandlePathfinding(); break;
                 case 6: RunCycleCheck(); break;
                 case 7:
+                    Console.WriteLine("Saving...");
                     Graph_SaverToFile.SaveToFile(graph, FILE_PATH);
                     break;
                 case 8:
+                    Console.WriteLine("Loading...");
                     graph = Graph_SaverToFile.LoadFromFile<string, Graph_Data, Edge_Data>(FILE_PATH);
                     break;
                 case 9: DemonstratePolymorphism(); break;
                 case 0: return;
-                default: Console.WriteLine("Uknown command."); break;
+                default: Console.WriteLine("Unknown command."); break;
             }
         }
     }
+
+    // --- HELPER METHODS FOR SAFE INPUT ---
+
+    /// <summary>
+    /// Safely reads an integer from the console. 
+    /// Prevents crashes by handling invalid format exceptions recursively.
+    /// </summary>
+    /// <param name="prompt">The text to display to the user.</param>
+    /// <returns>A valid integer entered by the user.</returns>
     private static int ReadInt(string prompt)
     {
         Console.Write(prompt);
@@ -60,135 +101,110 @@ public class Program
         {
             return result;
         }
-        Console.WriteLine("[ERROR]:Icorrect number format. Try again.");
+        Console.WriteLine("[ERROR]: Invalid number format. Please try again.");
         return ReadInt(prompt);
     }
+
+    /// <summary>
+    /// Reads a string from the console.
+    /// </summary>
+    /// <param name="prompt">The text to display to the user.</param>
+    /// <returns>The string entered by the user.</returns>
     private static string ReadString(string prompt)
     {
         Console.Write(prompt);
         return Console.ReadLine();
     }
+
+    // --- COMMAND HANDLERS (Private implementations) ---
+
     private static void HandleAddNode()
     {
-        Console.WriteLine("\n--- Adding Node ---");
-        string nodeID = ReadString("Enter unique ID: ");
+        Console.WriteLine("\n--- ADD NODE ---");
+        string nodeId = ReadString("Enter Unique ID: ");
 
-        Console.WriteLine("Choose data format:");
+        Console.WriteLine("Select Data Type:");
         Console.WriteLine("1: PersonData");
         Console.WriteLine("2: CityData");
         Console.WriteLine("3: CompanyData");
 
-        int choice = ReadInt("Choice: ");
+        int choice = ReadInt("Selection: ");
         Graph_Data nodeData = null;
+
         switch (choice)
         {
             case 1:
-                string name = ReadString("Name: ");
-                int age = ReadInt("Age: ");
-                nodeData = new Graph_Data.PersonData { Name = name, Age = age };
+                nodeData = new PersonData { Name = ReadString("Name: "), Age = ReadInt("Age: ") };
                 break;
             case 2:
-                string city = ReadString("City Name: ");
-                int population = ReadInt("Population: ");
-                nodeData = new Graph_Data.CityData { CityName = city, Population = population };
+                nodeData = new CityData { CityName = ReadString("City Name: "), Population = ReadInt("Population: ") };
                 break;
-
             case 3:
-                string company = ReadString("Company Name: ");
-                string industry = ReadString("Industry: ");
-                nodeData = new Graph_Data.CompanyData { CompanyName = company, Industry = industry };
+                nodeData = new CompanyData { CompanyName = ReadString("Company Name: "), Industry = ReadString("Industry: ") };
                 break;
-
             default:
-                Console.WriteLine("[ERROR]: Incorrect type of node. Adding canceled.");
+                Console.WriteLine("[ERROR]: Invalid type selected.");
                 return;
         }
-        if (nodeData != null)
-        {
-            graph.AddNode(nodeID, nodeData);
-            Console.WriteLine($"[SUCCESS]: Node '{nodeData.GetDisplayName()}' ({nodeID}) Added.");
-        }
+
+        if (nodeData != null) graph.AddNode(nodeId, nodeData);
     }
+
     private static void HandleAddEdge()
     {
-        Console.WriteLine("\n--- Adding Edge ---");
-        var nodeFromID = ReadString("Enter ID start Node: ");
-        var nodeToID = ReadString("Enter ID end Node: ");
+        Console.WriteLine("\n--- ADD EDGE ---");
+        string fromID = ReadString("From Node ID: ");
+        string toID = ReadString("To Node ID: ");
 
-        Console.WriteLine("Choose data format:");
-        Console.WriteLine("1: Friends since");
-        Console.WriteLine("2: Work as");
+        Console.WriteLine("Select Relationship Type:");
+        Console.WriteLine("1: Friendship (has Date)");
+        Console.WriteLine("2: Work (has Role)");
 
-        int choice = ReadInt("Choice: ");
+        int choice = ReadInt("Selection: ");
         Edge_Data edgeData = null;
+        double weight = 0;
+
         switch (choice)
         {
             case 1:
-                int year = ReadInt("The year the friendship began: ");
-                var since = new DateTime(year, 1, 1);
-                var weigth = ReadInt("Edge`s weigth(number): ");
-                edgeData = new Edge_Data.Edge_Friends { FriendsSince = since, Weight = weigth };
+                weight = (double)ReadInt("Weight (cost): ");
+                int year = ReadInt("Friends since (Year): ");
+                edgeData = new Edge_Data.Edge_Friends
+                {
+                    Weight = weight,
+                    FriendsSince = new DateTime(year, 1, 1)
+                };
                 break;
             case 2:
+                weight = (double)ReadInt("Weight (cost): ");
                 string role = ReadString("Role: ");
-                var weight = ReadInt("Edge`s weigth(number): ");
-                edgeData = new Edge_Data.WorksAtEdge { Role = role, Weight = weight };
+                edgeData = new Edge_Data.WorksAtEdge
+                {
+                    Weight = weight,
+                    Role = role
+                };
                 break;
             default:
-                Console.WriteLine("[ERROR]: Incorrect type of edge. Adding canceled.");
+                Console.WriteLine("[ERROR]: Invalid type.");
                 return;
         }
-        if (edgeData != null)
-        {
-            var nodeFrom = graph.GetNode(nodeFromID);
-            var nodeTo = graph.GetNode(nodeToID);
 
-            if (nodeFrom != null && nodeTo != null)
-            {
-                graph.AddEdge(nodeFromID, nodeToID, edgeData);
-                Console.WriteLine($"[SUCCESS]: Edge {edgeData.GetDecscription()} added.");
-            }
-            else
-            {
-                Console.WriteLine("[ERROR]:One or both nodes not found.");
-            }
-        }
+        if (edgeData != null) graph.AddEdge(fromID, toID, edgeData);
     }
-    static void HandleRemoveNode()
-    {
-        Console.WriteLine("\n--- Removing Node ---");
-        string nodeID = ReadString("Enter Node`s ID for removing: ");
-        graph.RemoveNode(nodeID);
-    }
-    static void HandleRemoveEdge()
-    {
-        Console.WriteLine("\n--- Removing Edge ---");
-        string fromID = ReadString("Enter ID start Node: ");
-        string toID = ReadString("Enter ID end Node: ");
-        if (graph.RemoveEdge(fromID, toID))
-        {
-            Console.WriteLine("[SUCCESS]: Edge removed.");
-        }
-        else
-        {
-            Console.WriteLine("[ERROR]: Edge or nodes not found.");
-        }
-    }
-    private static void DemonstratePolymorphism()
-    {
-        Console.WriteLine("\n--- 1. Demonstrating Dynamic Polymorphism (GetDetails) ---");
-        foreach (var node in graph.GetAllNodes())
-        {
-            Console.WriteLine($"- {node.Data.GetDetails()}");
-        }
 
-        var firstEdge = graph.GetAllEdges().FirstOrDefault();
-        if (firstEdge != null)
-        {
-            Console.WriteLine($"\n-> First edge: {firstEdge.From.Data.GetDisplayName()} -> {firstEdge.To.Data.GetDisplayName()}");
-            Console.WriteLine($"   Edge`s type: {firstEdge.Data.GetDecscription()}");
-        }
+    private static void HandleRemoveNode()
+    {
+        string id = ReadString("Enter Node ID to remove: ");
+        graph.RemoveNode(id);
     }
+
+    private static void HandleRemoveEdge()
+    {
+        string from = ReadString("From ID: ");
+        string to = ReadString("To ID: ");
+        if (graph.RemoveEdge(from, to)) Console.WriteLine("[SUCCESS]: Edge removed.");
+    }
+
     private static void HandlePathfinding()
     {
         string startId = ReadString("Start Node ID: ");
@@ -196,35 +212,42 @@ public class Program
         var startNode = graph.GetNode(startId);
         var endNode = graph.GetNode(endId);
 
-        if (startNode != null && endNode != null)
+        if (startNode == null || endNode == null)
         {
-            Console.WriteLine("Choose algorithm: 1-BFS, 2-DFS, 3-Dijkstra");
-            int alg = ReadInt("Choice: ");
-
-            List<NodeType> path = null;
-
-            if (alg == 1) path = GraphAlgorithms.BFS_Research(graph, startNode, n => n == endNode);
-            else if (alg == 2) path = GraphAlgorithms.DFS_Research(graph, startNode, n => n == endNode);
-            else if (alg == 3) path = GraphAlgorithms.Dijkstra_Search(graph, startNode, endNode);
-
-            if (path != null && path.Count > 0)
-            {
-                Console.WriteLine("Path found: " + string.Join(" -> ", path.Select(n => n.ID)));
-            }
-            else Console.WriteLine("Path not found.");
+            Console.WriteLine("[ERROR]: Nodes not found.");
+            return;
         }
-        else Console.WriteLine("Nodes not found.");
+
+        Console.WriteLine("Algorithm: 1-BFS, 2-DFS, 3-Dijkstra");
+        int alg = ReadInt("Selection: ");
+        List<NodeType> path = null;
+
+        switch (alg)
+        {
+            case 1: path = GraphAlgorithms.BFS_Research(graph, startNode, n => n == endNode); break;
+            case 2: path = GraphAlgorithms.DFS_Research(graph, startNode, n => n == endNode); break;
+            case 3: path = GraphAlgorithms.Dijkstra_Search(graph, startNode, endNode); break;
+        }
+
+        if (path != null && path.Count > 0)
+        {
+            Console.WriteLine("Path found: " + string.Join(" -> ", path.Select(n => n.Data.GetDisplayName())));
+        }
+        else Console.WriteLine("Path not found.");
     }
+
     private static void RunCycleCheck()
     {
-        Console.WriteLine("\n--- 3. Check for Cycles ---");
-        if (GraphAlgorithms.HasCycle(graph))
+        bool hasCycle = GraphAlgorithms.HasCycle(graph);
+        Console.WriteLine(hasCycle ? "[WARNING]: Graph contains cycles!" : "[INFO]: No cycles detected.");
+    }
+
+    private static void DemonstratePolymorphism()
+    {
+        Console.WriteLine("\n--- Nodes in Graph ---");
+        foreach (var node in graph.GetAllNodes())
         {
-            Console.WriteLine("[!!!] Graph contains cycles.");
-        }
-        else
-        {
-            Console.WriteLine("[OK] Graph do not contains cycles.");
+            Console.WriteLine($"[{node.ID}]: {node.Data.GetDetails()}");
         }
     }
 }
