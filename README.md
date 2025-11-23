@@ -1,6 +1,6 @@
 # 🕸️ Custom Graph Database (C#)
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![.NET](https://img.shields.io/badge/.NET-8.0-purple) ![License](https://img.shields.io/badge/license-MIT-blue)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![.NET](https://img.shields.io/badge/.NET-9.0-purple) ![License](https://img.shields.io/badge/license-MIT-blue)
 
 A powerful, typed graph database developed from scratch in C#. The project implements its own data structures and classic algorithms without using third-party graphics libraries.
 
