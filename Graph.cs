@@ -58,6 +58,10 @@ public class Graph<TKey, TData, TEdge_data>
         {
             edges.RemoveAll(e => e.From == node || e.To == node);
             Console.WriteLine($"Node with ID {id} removed.");
+            foreach (var otherNode in nodes.Values)
+            {
+                otherNode.Edges.RemoveAll(e => e.To == node);
+            }
         }
         else
         {
@@ -89,7 +93,7 @@ public class Graph<TKey, TData, TEdge_data>
 
             if (edge != null)
             {
-                // 3. Видаляємо
+    
                 fromNode.Edges.Remove(edge);
                 edges.Remove(edge);
                 Console.WriteLine($"[INFO]: Edge removed.");
