@@ -23,7 +23,7 @@ public abstract class Graph_Data
         }
         override public string GetDetails()
         {
-            return $"Name: {Name}, Age: {Age}";
+            return $"Person: Name: {Name}, Age: {Age}";
         }
     }
     public class CityData : Graph_Data
