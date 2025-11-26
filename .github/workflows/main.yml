@@ -1,31 +1,37 @@
-name: Generate and deploy Doxygen documents
+name: Deploy Doxygen Docs
 
 on:
   push:
     branches:
-      - features/docs-update
+      - main
+
+permissions:
+  contents: write
 
 jobs:
-  build:
-    permissions:
-      contents: write
-    runs-on:
-      ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Install Doxygen
-        run: sudo apt-get update && sudo apt-get install doxygen -y doxygen graphviz
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x' 
 
-      - name: Generate documentation
+      - name: Build Project
+        run: dotnet build --configuration Release
+
+      - name: Install Doxygen and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Run Doxygen
         run: doxygen Doxyfile
 
-      - name: Create .nojekyll file
-        run: touch ./docs/html/.nojekyll
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html
+          publish_dir: ./html
