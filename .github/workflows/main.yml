@@ -25,7 +25,7 @@ jobs:
         run: touch ./docs/html/.nojekyll
 
       - name: Deploy to GitHub Pages
-        uses: feature/docs-update
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/html
