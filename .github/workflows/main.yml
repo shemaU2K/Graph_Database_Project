@@ -3,7 +3,7 @@ name: Deploy Doxygen Docs
 on:
   push:
     branches:
-      - main
+      - feature/docs-update
 
 permissions:
   contents: write
