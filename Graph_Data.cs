@@ -56,7 +56,7 @@ public abstract class Graph_Data
         /// </summary>
         public override string GetDetails()
         {
-            return $"Name: {Name}, Age: {Age}";
+            return $"Person: Name: {Name}, Age: {Age}";
         }
     }
 

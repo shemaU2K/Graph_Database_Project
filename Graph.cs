@@ -98,6 +98,10 @@ public class Graph<TKey, TData, TEdge_data>
             // Removes edges associated with this node from the global list
             edges.RemoveAll(e => e.From == node || e.To == node);
             Console.WriteLine($"Node with ID {id} removed.");
+            foreach (var otherNode in nodes.Values)
+            {
+                otherNode.Edges.RemoveAll(e => e.To == node);
+            }
         }
         else
         {
@@ -160,6 +164,7 @@ public class Graph<TKey, TData, TEdge_data>
             if (edge != null)
             {
                 // Remove from local list and global list
+    
                 fromNode.Edges.Remove(edge);
                 edges.Remove(edge);
                 Console.WriteLine($"[INFO]: Edge removed.");
