@@ -4,7 +4,7 @@
 
 A powerful, typed graph database developed from scratch in C#. The project implements its own data structures and classic algorithms without using third-party graphics libraries.
 
-## 🌟 Особливості
+## 🌟 Features 
 
 * **Generic Architecture:** Flexible type system `<TKey, TData, TEdgeData>`.
 * **Polymorphism Support:**
