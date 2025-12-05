@@ -1,0 +1,225 @@
+﻿<Window x:Class="Graph_Database_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:gx="http://schemas.panthernet.ru/graphx/"
+        xmlns:local="clr-namespace:Graph_Database_WPF"
+        mc:Ignorable="d"
+        Title="Graph Database Manager" Height="850" Width="1100"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <DataTemplate x:Key="VertexTemplate" DataType="{x:Type local:DataVertex}">
+            <Grid>
+                <Ellipse Width="50" Height="50" Fill="LightSkyBlue" Stroke="Navy" StrokeThickness="2"/>
+                <TextBlock Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EdgeTemplate" DataType="{x:Type local:DataEdge}">
+            <TextBlock Text="{Binding Text}" Background="White" FontSize="10"/>
+        </DataTemplate>
+
+        <Style TargetType="{x:Type local:MyGraphArea}">
+            <Setter Property="VertexDataTemplate" Value="{StaticResource VertexTemplate}"/>
+            <Setter Property="EdgeLabelTemplate" Value="{StaticResource EdgeTemplate}"/>
+            <Setter Property="EdgeColor" Value="Gray"/>
+            <Setter Property="EdgeThickness" Value="2"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+
+            <TextBlock Text="Node Management" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Node ID (Unique):"/>
+            <TextBox Text="{Binding NewNodeId, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,5" Padding="5"/>
+
+            <Button Content="Remove Node by ID" 
+                    Command="{Binding RemoveNodeCommand}" 
+                    Background="#FFDDDD" Margin="0,0,0,15"/>
+
+            <TabControl Height="350">
+                <TabItem Header="Person">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Name:"/>
+                        <TextBox Text="{Binding PersonName}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Age:"/>
+                        <TextBox Text="{Binding PersonAge}" Margin="0,0,0,10"/>
+                        <Button Content="Add Person Node" Command="{Binding AddPersonCommand}" Height="30"/>
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="City">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="City Name:"/>
+                        <TextBox Text="{Binding CityName}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Population:"/>
+                        <TextBox Text="{Binding CityPopulation}" Margin="0,0,0,10"/>
+                        <Button Content="Add City Node" Command="{Binding AddCityCommand}" Height="30"/>
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Company">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Company Name:"/>
+                        <TextBox Text="{Binding CompanyName}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Industry:"/>
+                        <TextBox Text="{Binding CompanyIndustry}" Margin="0,0,0,10"/>
+                        <Button Content="Add Company Node" Command="{Binding AddCompanyCommand}" Height="30"/>
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Edges">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Source &amp; Target" FontWeight="Bold" Margin="0,0,0,5"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                <TextBlock Text="From ID:"/>
+                                <TextBox Text="{Binding SourceNodeId, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="To ID:"/>
+                                <TextBox Text="{Binding TargetNodeId, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator Margin="0,5"/>
+                        <TextBlock Text="Create Connection" FontWeight="Bold"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                <TextBlock Text="Weight:"/>
+                                <TextBox Text="{Binding EdgeWeight}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Role/Type:"/>
+                                <TextBox Text="{Binding EdgeRole}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Content="Add Edge" 
+                                Command="{Binding ConnectCommand}" 
+                                Height="30" Margin="0,10,0,5" 
+                                Background="#DDFFDD"/>
+
+                        <Separator Margin="0,5"/>
+
+                        <Button Content="Remove Edge (From -> To)" 
+                                Command="{Binding RemoveEdgeCommand}" 
+                                Height="25" Margin="0,5,0,0" 
+                                Background="#FFDDDD" Foreground="DarkRed"/>
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Algorithms">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Pathfinding &amp; Traversal" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Start Node ID:"/>
+                        <TextBox Text="{Binding AlgoStartNodeId}" Margin="0,0,0,5"/>
+
+                        <TextBlock Text="End Node ID (Target):"/>
+                        <TextBox Text="{Binding AlgoEndNodeId}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Run Algorithm:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Content="Dijkstra" 
+                                    Command="{Binding RunDijkstraCommand}" 
+                                    Margin="0,0,2,0" Height="30"
+                                    Background="#E0F7FA" ToolTip="Find Shortest Path"/>
+
+                            <Button Grid.Column="1" Content="BFS" 
+                                    Command="{Binding RunBFSCommand}" 
+                                    Margin="2,0,2,0" Height="30"
+                                    Background="#FFF9C4" ToolTip="Breadth-First Search"/>
+
+                            <Button Grid.Column="2" Content="DFS" 
+                                    Command="{Binding RunDFSCommand}" 
+                                    Margin="2,0,0,0" Height="30"
+                                    Background="#E1BEE7" ToolTip="Depth-First Search"/>
+                        </Grid>
+
+                        <TextBlock Text="Result Path:" FontWeight="Bold" Margin="0,10,0,5"/>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Height="80">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding AlgoResult}" 
+                                           TextWrapping="Wrap" 
+                                           Padding="5" 
+                                           Foreground="Blue"
+                                           FontFamily="Consolas"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+
+            <TextBlock Text="Project Actions" FontWeight="Bold" Margin="0,20,0,5"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Button Content="Save Project" Command="{Binding SaveCommand}" Height="30" Margin="0,0,5,0"  Width="150"/>
+                <Button Content="Load Project" Command="{Binding LoadCommand}" Height="30" Margin="5,0,0,0"  Width="150"/>
+            </StackPanel>
+
+            <TextBlock Text="System Status / Errors:" Margin="0,15,0,2" Foreground="Gray"/>
+            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Background="#F9F9F9">
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Foreground="Red" 
+                           FontWeight="Medium"
+                           TextWrapping="Wrap" 
+                           Padding="5"
+                           MinHeight="40"/>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Column="1" Margin="5,0,0,0">
+            <TabControl>
+                <TabItem Header="GraphX View">
+                    <gx:ZoomControl>
+                        <local:MyGraphArea x:Name="Area"
+                                           LogicCore="{Binding LogicCore}"
+                                           Graph="{Binding GraphToVisualize}"
+                                           GenerateGraph="True"/>
+                    </gx:ZoomControl>
+                </TabItem>
+
+                <TabItem Header="Raw Data Lists">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Nodes List" Grid.Row="0">
+                            <ListBox ItemsSource="{Binding NodesList}" FontSize="14" BorderThickness="0"/>
+                        </GroupBox>
+                        <GroupBox Header="Edges List" Grid.Row="1">
+                            <ListBox ItemsSource="{Binding EdgesList}" FontSize="14" BorderThickness="0" Background="#FAFAFA"/>
+                        </GroupBox>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
+</Window>
