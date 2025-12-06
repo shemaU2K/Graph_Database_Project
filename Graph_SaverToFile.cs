@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+namespace Graph_database;
 /// <summary>
 /// Data Transfer Object (DTO) representing a node for serialization purposes.
 /// Decouples the storage format from the runtime logic.
@@ -154,3 +154,4 @@ public static class Graph_SaverToFile
         return graph;
     }
 }
+
