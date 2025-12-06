@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-
+namespace Graph_database;
 /// <summary>
 /// Represents the abstract base class for data payload stored within a graph node.
 /// Supports polymorphic JSON serialization/deserialization to handle various entity types.
@@ -124,3 +124,4 @@ public abstract class Graph_Data
         }
     }
 }
+
