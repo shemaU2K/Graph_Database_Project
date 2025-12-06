@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+namespace Graph_database; 
 /// <summary>
 /// Represents a generic graph data structure implemented using adjacency lists.
 /// Supports generic keys, polymorphic node data, and polymorphic edge data.
@@ -176,3 +176,4 @@ public class Graph<TKey, TData, TEdge_data>
         return false;
     }
 }
+
