@@ -7,7 +7,7 @@ using static Graph_Data;
 // Alias types for convenience and code brevity
 using GraphType = Graph<string, Graph_Data, Edge_Data>;
 using NodeType = Node<string, Graph_Data, Edge_Data>;
-
+namespace Graph_database;
 /// <summary>
 /// The entry point of the Graph Database Console Application.
 /// Provides a CLI (Command Line Interface) for interacting with the graph: 
@@ -251,3 +251,4 @@ class Program
         }
     }
 }
+
