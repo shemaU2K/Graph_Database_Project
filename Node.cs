@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+namespace Graph_database;
 /// <summary>
 /// Represents a single node (vertex) within the graph structure.
 /// Acts as a container for data and maintains a list of outgoing connections.
@@ -41,3 +41,4 @@ public class Node<Tkey, Tdata, TEdge_data>
         Data = data;
     }
 }
+
