@@ -1,5 +1,5 @@
 using System;
-
+namespace Graph_database;
 /// <summary>
 /// Represents a directed edge (connection) between two nodes in the graph.
 /// Stores references to the source and target nodes, along with specific edge data.
@@ -40,3 +40,4 @@ public class Edge<Tkey, Tdata, TEdge_data>
         Data = data;
     }
 }
+
