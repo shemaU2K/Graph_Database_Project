@@ -291,7 +291,7 @@ namespace Graph_Database_WPF.ViewModels
         [RelayCommand]
         private void AddConnectionManual()
         {
-            // Видаляємо пробіли, щоб "c1 " стало "c1"
+        
             string sId = ConnSourceId?.Trim();
             string tId = ConnTargetId?.Trim();
 
@@ -341,10 +341,8 @@ namespace Graph_Database_WPF.ViewModels
                 _graphService.RemoveEdge(ConnSourceId, ConnTargetId);
                 _graphService.Save();
 
-                // УВАГА: Тут перевір, чи існує ParentNode і ID. 
-                // Часто буває просто c.SourceId == ConnSourceId
                 var conn = Connections.FirstOrDefault(c =>
-                    c.Source.ParentNode.Id == ConnSourceId && // Перевір, чи Id не написаний як ID
+                    c.Source.ParentNode.Id == ConnSourceId &&
                     c.Target.ParentNode.Id == ConnTargetId);
 
                 if (conn != null) Connections.Remove(conn);
@@ -403,3 +401,4 @@ namespace Graph_Database_WPF.ViewModels
         }
     }
 }
+
