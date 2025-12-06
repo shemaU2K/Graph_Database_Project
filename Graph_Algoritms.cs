@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+namespace Graph_database;
 /// <summary>
 /// Provides a static collection of algorithms for graph analysis and traversal.
 /// Includes standard pathfinding methods (BFS, DFS, Dijkstra), structural checks (Cycle Detection), and utility methods.
@@ -324,3 +324,4 @@ public static class GraphAlgorithms
         return false;
     }
 }
+
