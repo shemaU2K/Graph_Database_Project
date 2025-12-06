@@ -1,4 +1,3 @@
-﻿using Graph_Database_WPF.ViewModels;
 using System.Windows;
 
 namespace Graph_Database_WPF
@@ -8,7 +7,6 @@ namespace Graph_Database_WPF
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
         }
     }
 }
